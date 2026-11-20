@@ -76,7 +76,7 @@ github:guoxdxdxd/WorkSelf#<40 位 commit>
 
 跟随最新代码就填浮动地址 `github:guoxdxdxd/WorkSelf`，要固定版本就填 `#v0.2.1` 这类 tag。两种都走上面的移除重装：pnpm 会按地址重新解析，拿到它当前指向的最新提交——**版本号没变也会拿到新内容**。
 
-> DSH 只把**固定到完整 40 位 commit** 的 Git 安装视为可更新（`update: git`，换成另一个 commit，失败回滚到原版本）；tag 与浮动地址都不算，所以它们必须走移除重装。
+> DSH 的插件页**没有**给第三方 GitHub 插件做升级入口：页面上的「更新」按钮只对 registry 发布的包和官方按需插件出现；从 Git 地址装的插件，无论浮动地址、tag 还是固定 commit，都只能按上面的步骤卸载重装（固定 commit 的价值是版本可追溯、可回退，不是换来一个按钮）。
 
 ## 用法
 
