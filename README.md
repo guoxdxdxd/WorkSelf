@@ -38,7 +38,7 @@ github:guoxdxdxd/WorkSelf
 想固定到某个版本，就在后面接 tag 或 commit：
 
 ```text
-github:guoxdxdxd/WorkSelf#v0.2.0
+github:guoxdxdxd/WorkSelf#v0.2.1
 github:guoxdxdxd/WorkSelf#<40 位 commit>
 ```
 
@@ -71,10 +71,10 @@ github:guoxdxdxd/WorkSelf#<40 位 commit>
 插件没有自动更新，**更新 = 再装一次**。工作档案在工作区里（`workos/`），移除插件不会动它。
 
 1. Plugins → workself → **移除**；
-2. **Add plugin** 再填一遍安装地址，换版本就顺手把 `#v0.2.0` 改掉；
+2. **Add plugin** 再填一遍安装地址，换版本就顺手把 `#v0.2.1` 改掉；
 3. 按提示**重启 DSH**，界面刷新页面。
 
-跟随最新代码就填浮动地址 `github:guoxdxdxd/WorkSelf`，要固定版本就填 `#v0.2.0` 这类 tag。两种都走上面的移除重装：pnpm 会按地址重新解析，拿到它当前指向的最新提交——**版本号没变也会拿到新内容**。
+跟随最新代码就填浮动地址 `github:guoxdxdxd/WorkSelf`，要固定版本就填 `#v0.2.1` 这类 tag。两种都走上面的移除重装：pnpm 会按地址重新解析，拿到它当前指向的最新提交——**版本号没变也会拿到新内容**。
 
 > DSH 只把**固定到完整 40 位 commit** 的 Git 安装视为可更新（`update: git`，换成另一个 commit，失败回滚到原版本）；tag 与浮动地址都不算，所以它们必须走移除重装。
 
@@ -205,7 +205,7 @@ workos/
 版本号只写在 `package.json` 里，发布由 `.github/workflows/release.yml` 完成：
 
 1. 改 `package.json` 的 `version`，提交并推到 `main`；
-2. 打 tag 并推送：`git tag -a v0.2.0 -m v0.2.0 && git push origin v0.2.0`；
+2. 打 tag 并推送：`git tag -a v0.2.1 -m v0.2.1 && git push origin v0.2.1`；
 3. Actions 校验 tag 与版本号一致、跑语法检查、`npm pack` 打包，然后建 Release 并附上 tarball。
 
 也可以在 Actions 页面手动触发 **Release** 并填版本号：它会先按 `package.json` 校验，再自己打 tag、推送并发布。版本号与 tag 不一致、或远端已有同名 tag 时直接失败，不会发出半个版本。
