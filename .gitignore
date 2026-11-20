@@ -1,0 +1,17 @@
+# 工作档案：个人工作数据，不入库
+/workos/
+
+# 工作区 Agent 设定：插件在运行期生成到工作区根目录，不入库
+/AGENTS.md
+
+# macOS
+.DS_Store
+
+# 依赖与构建产物
+node_modules/
+dist/
+*.log
+
+# 本地环境配置
+.env
+.env.local

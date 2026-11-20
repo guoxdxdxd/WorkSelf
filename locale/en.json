@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "WorkSelf",
+    "description": "Adds an AI work assistant tab to the conversation right sidebar: project goals, work items with owner/participants/dependencies/due, item logs, and each contact’s 打交道经验. Push an item, log or person into the chat; the agent expands it with workos_context (project, dependencies, people and their experience), answers concretely, and writes approved plans, logs and experience back to Markdown. Manual and scheduled daily/weekly reports are generated in a fresh conversation, written to data/日报 and data/周报, and listed newest-first in project detail for review and editing."
+  }
+}

@@ -1,0 +1,5 @@
+- insert:
+    - id: workos
+      name: '@local/dsh-workos'
+      config:
+        subdir: workos

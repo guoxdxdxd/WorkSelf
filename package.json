@@ -1,0 +1,39 @@
+{
+  "name": "@local/dsh-workos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WorkSelf 工作助手：把项目、事项依赖、人物打交道经验变成可加入对话的上下文，AI 结合环境给建议并把结果写回；支持手动/自动生成日报周报。",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "lib",
+    "assets",
+    "locale/*.json",
+    "docs",
+    "README.md",
+    "icon.svg"
+  ],
+  "icon": "./icon.svg",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guoxdxdxd/WorkSelf.git"
+  },
+  "homepage": "https://github.com/guoxdxdxd/WorkSelf"
+}
