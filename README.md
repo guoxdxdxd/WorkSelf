@@ -35,6 +35,13 @@ WorkSelf 是 [DeepSeek Harness](https://github.com/deepseek-ai) 的本地插件�
 github:guoxdxdxd/WorkSelf
 ```
 
+想固定到某个版本，就在后面接 tag 或 commit：
+
+```text
+github:guoxdxdxd/WorkSelf#v0.2.0
+github:guoxdxdxd/WorkSelf#<40 位 commit>
+```
+
 也可以填完整地址 `https://github.com/guoxdxdxd/WorkSelf`。装好后按提示**重启 DSH**（宿主侧插件不热更）。
 
 ### 本地开发（改代码用）
@@ -58,6 +65,18 @@ github:guoxdxdxd/WorkSelf
 - 创建 `workos/` 档案（已有文件不覆盖）；
 - 在联系人里加入默认的「我」，新事项负责人默认「我」；
 - 在工作区根目录写入 `AGENTS.md` 的助手设定段（已有内容保留，插件升级时原地刷新）。
+
+## 更新
+
+插件没有自动更新，**更新 = 再装一次**。工作档案在工作区里（`workos/`），移除插件不会动它。
+
+1. Plugins → workself → **移除**；
+2. **Add plugin** 再填一遍安装地址，换版本就顺手把 `#v0.2.0` 改掉；
+3. 按提示**重启 DSH**，界面刷新页面。
+
+跟随最新代码就填浮动地址 `github:guoxdxdxd/WorkSelf`，要固定版本就填 `#v0.2.0` 这类 tag。两种都走上面的移除重装：pnpm 会按地址重新解析，拿到它当前指向的最新提交——**版本号没变也会拿到新内容**。
+
+> DSH 只把**固定到完整 40 位 commit** 的 Git 安装视为可更新（`update: git`，换成另一个 commit，失败回滚到原版本）；tag 与浮动地址都不算，所以它们必须走移除重装。
 
 ## 用法
 

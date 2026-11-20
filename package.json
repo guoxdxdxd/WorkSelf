@@ -1,6 +1,6 @@
 {
   "name": "workself",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "WorkSelf 工作助手：把项目、事项依赖、人物打交道经验变成可加入对话的上下文，AI 结合环境给建议并把结果写回；支持手动/自动生成日报周报。",
   "exports": {
