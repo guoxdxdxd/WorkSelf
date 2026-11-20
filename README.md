@@ -200,6 +200,17 @@ workos/
   for f in index.js client.js lib/*.js; do node --check "$f"; done
   ```
 
+### 发布
+
+版本号只写在 `package.json` 里，发布由 `.github/workflows/release.yml` 完成：
+
+1. 改 `package.json` 的 `version`，提交并推到 `main`；
+2. 打 tag 并推送：`git tag -a v0.2.0 -m v0.2.0 && git push origin v0.2.0`；
+3. Actions 校验 tag 与版本号一致、跑语法检查、`npm pack` 打包，然后建 Release 并附上 tarball。
+
+也可以在 Actions 页面手动触发 **Release** 并填版本号：它会先按 `package.json` 校验，再自己打 tag、推送并发布。版本号与 tag 不一致、或远端已有同名 tag 时直接失败，不会发出半个版本。
+
+
 
 ## 隐私
 
