@@ -104,7 +104,7 @@ export function apply(ctx, config = {}) {
     ctx.effect(() => systemPrompt.section({
       name: 'workos',
       order: 60,
-      text: '工作助手（仅当前工作区存在 workos/ 工作档案时生效）：档案是一个项目一个文件夹（work/{部门}/{年}/项目/{项目名}/README.md 是项目主档，事项/ 下每个事项一个 md，日志写在事项文件的 ## 日志 里）；不属于任何项目的临时事项放 work/{部门}/{年}/日常工作/，一个事项一个 md，文件名前缀是添加时的日期时分秒。只用 workos_update 写入，不要手工新建或改名文件：新增事项用 item.add（传 uid = 项目事项；不传 uid 或 uid 0 = 日常工作），改字段 item.update，记日志 item.log.add，补充用 item.log.update。每轮对话先判断这件事属于日常工作还是某个项目：一次性的、没有独立项目目标/节点/交付物的临时工作 → item.add 不传 uid 落到日常工作；否则先查 workos_overview / workos_search 找项目（项目名、人名、事由、时间、部门），能挂现有事项就更新，没有事项就在该项目 item.add，连项目也没有、又确属新工作才 project.create；不要为临时工作造项目，也不要把临时工作硬塞进无关项目。判断完再回答；回答后把新事实、决定、状态变化、他人反馈写成事项日志（前因 → 事件 → 结果 → 关联，一次变更一条，合并同一天同一件事，不写流水账），不要等用户说「记一下」。用户消息出现【工作上下文】时先 workos_context（uid=0 表示日常工作）；标记里的 path 是那条内容在工作区内的相对路径（工作区外的才是绝对路径），可直接按它读文件。要生成日报/周报时，先用 workos_report_data 取数，再用 workos_report_save 写回；个人汇报不传 uid（含日常工作），写回 data/日报 或 data/周报；项目汇报传 uid，写回该项目文件夹的 汇报/日报 或 汇报/周报，且只写该项目。',
+      text: '工作助手（仅当前工作区存在 workos/ 工作档案时生效）：回答与我的工作有关的问题前，先查档案（workos_overview / workos_context / workos_search / workos_read），只依据档案事实，不编造；回答完把新事实写回（workos_update），不等用户提醒。工作舱地图、认路顺序、五步写回与边界见工作区 AGENTS.md 的 workos-agent 段，以及 workos-persona / workos-maintain 两个技能。',
     }))
   }
 

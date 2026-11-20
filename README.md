@@ -20,7 +20,7 @@ WorkSelf 是 [DeepSeek Harness](https://github.com/deepseek-ai) 的本地插件�
 | --- | --- |
 | 工作台 | 在办、逾期、阻塞、最近日志、日常工作；每条都能加入对话 |
 | 项目 | 目标与背景、事项列表（全部 / 未完成快筛）、项目汇报；项目与事项都能加入对话 |
-| 联系人 | 资料 + 打交道经验；可加入对话 |
+| 联系人 | 资料 + 打交道经验；可加入对话，也可编辑、删除 |
 | 设置 | 目录、索引、迁移旧档案（单文件 → 文件夹） |
 
 ## 安装
@@ -85,14 +85,13 @@ AI 每轮先判断归属：一次性的、没有独立项目目标 / 节点 / �
 
 ### 工作区 Agent
 
-首次打开会在工作区根目录生成 `AGENTS.md`（助手段用 `<!-- workos-agent:start -->` 标记）：
+首次打开会在工作区根目录生成 `AGENTS.md`（助手段用 `<!-- workos-agent:start -->` 标记），内容是一份以「我」为原型的助手设定，围绕三条铁律组织：
 
-- 以「我」的身份回答，先读 `workos/data/个人信息.md`；
-- 看到【工作上下文】先 `workos_context`，再查依赖与相关人的打交道经验；
-- 每轮自动判断归属并写回日志；新出现的人先问清资料再 `contact.add`；
-- 回答结构：判断 → 动作（谁 / 何时 / 怎么说）→ 风险 → 检查点。
+- **认路**：先看工作舱地图（`data/` 人与经验、`work/{部门}/{年}/` 项目与事项、`事项/` 独立文件、`日常工作/`、个人/项目汇报），再按 `workos_overview → context → query → search → read` 找内容，不猜文件名；
+- **有据**：看到【工作上下文】先 `workos_context`，再查依赖与相关人的打交道经验；只依据档案回答，档案没有就说没有；
+- **留痕**：每轮自动判断归属并写回日志；新出现的人先问清资料再 `contact.add`；回答结构：判断 → 动作（谁 / 何时 / 怎么说）→ 风险 → 检查点。
 
-DSH 的 `dsh-agent-instructions` 会在该工作区的每个会话里自动加载这份文件，不需要手动选 agent。文件里其他内容不会被覆盖。
+设定正文在仓库 `assets/workos-agent.md`，初始化时写入；插件升级后下一轮打开驾驶舱会原地刷新。DSH 的 `dsh-agent-instructions` 会在该工作区的每个会话里自动加载这份文件，不需要手动选 agent。文件里其他内容不会被覆盖。
 
 ## 工具与技能
 
@@ -107,7 +106,7 @@ DSH 的 `dsh-agent-instructions` 会在该工作区的每个会话里自动加�
 | `workos_read` | 读任意 Markdown 原文（日常工作可给 `itemId: d1`） |
 | `workos_update` | 建项目、加 / 改 / 删事项、记日志、补经验、写回（不传 `uid` = 日常工作） |
 | `workos_report_data` | 读取某时段日志、项目进展与在办事项，专供生成日报周报（传 `uid` 只取一个项目） |
-| `workos_report_save` | 写回汇报：不传 `uid` 写 `data/日报|周报`（个人），传 `uid` 写项目文件夹的 `汇报/日报|周报` |
+| `workos_report_save` | 写回汇报：不传 `uid` 写 `data/日报`、`data/周报`（个人），传 `uid` 写项目文件夹的 `汇报/日报`、`汇报/周报` |
 
 内置两个技能：
 
@@ -126,8 +125,7 @@ workos/
 │   ├── workos/.index/          SQLite 检索索引（可删可重建）
 │   ├── 日报/YYYY-MM-DD.md       个人日报
 │   ├── 周报/起始_结束.md        个人周报
-│   └── {个人信息,人脉关系,企业组织架构,当前企业信息,
-│        年度目标与KPI,规章制度,常用资源,工作经历,经验}.md
+│   └── 经验.md
 └── work/{部门}/{年}/
     ├── 项目/{项目名}/
     │   ├── README.md              项目主档：元数据、目标与背景、事项索引、进展、复盘
@@ -161,7 +159,7 @@ workos/
 │   ├── reports.js       日报 / 周报取数与写回
 │   ├── skills.js        技能注册
 │   └── tools.js         工具注册
-├── assets/              内置技能（workos-persona / workos-maintain）
+├── assets/              内置 agent 设定与技能（workos-agent / workos-persona / workos-maintain）
 ├── locale/              中英文案
 ├── docs/                数据模型（DATA_MODEL.md）与插件细节（PLUGIN.md）
 ├── cordis.patch.yml     插件补丁（挂载页签）

@@ -94,8 +94,9 @@ window.__ModuleLoader__.load({
 .wo-textarea{resize:vertical;min-height:56px}
 .wo-form{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-bottom:1px solid var(--dsw-alias-border-l1)}
 .wo-form>.wo-btn{align-self:flex-start}
-.wo-bar{display:flex;gap:6px;align-items:center}
+.wo-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .wo-bar>.wo-input{flex:1}
+.wo-bar>.wo-field{flex:1 1 120px;min-width:0}
 .wo-bar>.wo-btn{flex:none}
 .wo-chip{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--dsw-alias-border-l1);border-radius:999px;padding:0 6px;font-size:10px;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-2);white-space:nowrap;line-height:1.6;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .wo-chip.warn{color:var(--dsw-alias-state-warn-primary);border-color:currentColor}
@@ -336,6 +337,30 @@ window.__ModuleLoader__.load({
         contact.experience ? `打交道经验：${contact.experience}` : '打交道经验：（还没有记录）',
       ].filter(Boolean).join('\n')
       return quote(text, '工作上下文', [contact.company, contact.role].filter(Boolean).join(' · '), contact.experience || '暂无打交道经验', contact.name)
+    }
+
+    /**
+     * Where a contact's name is still referenced. Deletion only removes the
+     * contact row; project/item owner fields keep the plain name, so warn with
+     * the exact places instead of silently leaving stale owners behind.
+     */
+    function contactReferences(name, projects = [], dailyItems = []) {
+      if (!name) return []
+      const out = []
+      for (const project of projects || []) {
+        if (!project) continue
+        if (project.owner === name) out.push(`项目「${project.name}」负责人`)
+        if ((project.participants || []).includes(name)) out.push(`项目「${project.name}」涉及人员`)
+        for (const item of project.items || []) {
+          if (item.owner === name) out.push(`事项 ${item.itemId}「${item.title}」负责人`)
+          if ((item.participants || []).includes(name)) out.push(`事项 ${item.itemId}「${item.title}」涉及人员`)
+        }
+      }
+      for (const item of dailyItems || []) {
+        if (item.owner === name) out.push(`日常工作 ${item.itemId}「${item.title}」负责人`)
+        if ((item.participants || []).includes(name)) out.push(`日常工作 ${item.itemId}「${item.title}」涉及人员`)
+      }
+      return out
     }
 
     function projectContext(project, workspace) {
@@ -1161,7 +1186,7 @@ window.__ModuleLoader__.load({
       h(LogForm, { onSubmit: input => onLog(item, input), busy }))
     }
 
-    function ProjectDetail({ project, contacts, reports, onBack, onAct, onChat, onDeleteProject, onOpenReport, onOpenReportDetail, onRefresh, busy, initialItemId, workspace }) {
+    function ProjectDetail({ project, contacts, reports, allProjects = [], dailyItems = [], onBack, onAct, onChat, onDeleteProject, onOpenReport, onOpenReportDetail, onRefresh, busy, initialItemId, workspace }) {
       const [filter, setFilter] = React.useState('open')
       // The detail modal is a stack: clicking a dependency opens that item on
       // top, and "返回" walks back to where you came from.
@@ -1307,8 +1332,12 @@ window.__ModuleLoader__.load({
         }) : null,
         contactEditor ? h(ContactModal, {
           contact: contactEditor,
+          references: contactEditor?.id ? contactReferences(contactEditor.name, allProjects, dailyItems) : [],
           onClose: () => setContactEditor(null),
           onSave: saveContact,
+          onDelete: async target => {
+            if (await onAct({ action: 'contact.remove', id: target.id })) setContactEditor(null)
+          },
           busy,
         }) : null)
     }
@@ -1401,30 +1430,54 @@ window.__ModuleLoader__.load({
               h(Button, { small: true, onClick: () => setModal(contact) }, '编辑'))))),
         modal ? h(ContactModal, {
           contact: modal === 'new' ? null : modal,
+          references: modal === 'new' ? [] : contactReferences(modal.name, state.projects, state.daily?.items || []),
           onClose: () => setModal(null),
           onSave: async form => {
             if (modal === 'new') await onAct({ action: 'contact.add', ...form })
             else await onAct({ action: 'contact.update', id: modal.id, patch: form })
             setModal(null)
           },
+          onDelete: async target => {
+            if (await onAct({ action: 'contact.remove', id: target.id })) setModal(null)
+          },
           busy,
         }) : null)
     }
 
-    function ContactModal({ contact, onClose, onSave, busy }) {
+    function ContactModal({ contact, references = [], onClose, onSave, onDelete, busy }) {
       const [form, setForm] = React.useState({
         name: contact?.name || '', company: contact?.company || '', dept: contact?.dept || '',
         role: contact?.role || '', phone: contact?.phone || '', duty: contact?.duty || '',
         experience: contact?.experience || '', note: contact?.note || '',
       })
       const set = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
+      const remove = async () => {
+        if (!onDelete) return
+        const lines = [
+          `删除联系人「${contact.name}」？`,
+          '只从联系人档案移除，他的资料和打交道经验会一起删除，不可恢复。',
+        ]
+        if (references.length) {
+          lines.push('', `仍有 ${references.length} 处引用，项目/事项里的名字不会自动改：`)
+          for (const ref of references.slice(0, 6)) lines.push(`· ${ref}`)
+          if (references.length > 6) lines.push(`· 等 ${references.length} 处`)
+        } else {
+          lines.push('', '目前项目与事项都没有引用这个名字。')
+        }
+        if (!window.confirm(lines.join('\n'))) return
+        await onDelete(contact)
+      }
       return h(Modal, {
         title: contact?.id ? `编辑 ${contact.name}` : '新增联系人',
         onClose,
         footer: [
+          contact?.id && contact.name !== '我' && onDelete
+            ? h('span', { key: 'd', style: { marginRight: 'auto' } },
+              h(Button, { kind: 'danger', small: true, disabled: busy, onClick: remove }, '删除联系人'))
+            : null,
           h(Button, { key: 'c', kind: 'ghost', onClick: onClose }, '取消'),
           h(Button, { key: 's', kind: 'primary', disabled: busy || !form.name.trim(), onClick: () => onSave(form) }, '保存'),
-        ],
+        ].filter(Boolean),
       },
       h(Field, { label: '姓名' }, h('input', { className: 'wo-input', autoFocus: true, value: form.name, onChange: event => set('name', event.target.value) })),
       h('div', { className: 'wo-bar' },
@@ -1435,7 +1488,10 @@ window.__ModuleLoader__.load({
         h(Field, { label: '电话' }, h('input', { className: 'wo-input', value: form.phone, onChange: event => set('phone', event.target.value) }))),
       h(Field, { label: '负责事项' }, h('input', { className: 'wo-input', value: form.duty, onChange: event => set('duty', event.target.value) })),
       h(Field, { label: '打交道经验（怎么和他相处、下次注意什么）' }, h('textarea', { className: 'wo-textarea', value: form.experience, onChange: event => set('experience', event.target.value), placeholder: '如：好说话，但排期紧时要提前三天催；口头承诺要邮件确认' })),
-      h(Field, { label: '备注' }, h('input', { className: 'wo-input', value: form.note, onChange: event => set('note', event.target.value) })))
+      h(Field, { label: '备注' }, h('input', { className: 'wo-input', value: form.note, onChange: event => set('note', event.target.value) })),
+      contact?.id && contact.name === '我'
+        ? h('div', { className: 'wo-muted', style: { fontSize: 11 } }, '「我」是本人档案，不能删除；资料直接在上面改。')
+        : null)
     }
 
     /* ------------------------------------------------------------- settings */
@@ -1576,8 +1632,10 @@ window.__ModuleLoader__.load({
             setDetail(data.project)
           }
           if (!quiet) flash('已写回 Markdown')
+          return true
         } catch (err) {
           flash(err.message, true)
+          return false
         } finally {
           setBusy(false)
         }
@@ -1685,6 +1743,8 @@ window.__ModuleLoader__.load({
               project: detail,
               contacts: state.contacts,
               reports: state.reports || [],
+              allProjects: state.projects,
+              dailyItems: state.daily?.items || [],
               onBack: closeDetail,
               onAct: act,
               onChat: addToChat,
