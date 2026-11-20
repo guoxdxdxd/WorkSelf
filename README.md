@@ -27,23 +27,15 @@ WorkSelf 是 [DeepSeek Harness](https://github.com/deepseek-ai) 的本地插件�
 
 前提：一份带客户端插件能力的 DSH（DeepSeek Harness）。仓库根就是插件包，以下三种方式任选其一。
 
-### 从 npm 安装（推荐）
+### 从 GitHub 安装（推荐）
 
-在 DSH 侧栏打开 **Plugins** → **Add plugin** → **Install a third-party plugin**，填包名：
-
-```text
-workself
-```
-
-装好后按提示**重启 DSH**（宿主侧插件不热更）。
-
-### 从 GitHub 安装
-
-不想用 npm 时，填仓库地址也可以：
+在 DSH 侧栏打开 **Plugins** → **Add plugin** → **Install a third-party plugin**，填仓库地址：
 
 ```text
 github:guoxdxdxd/WorkSelf
 ```
+
+也可以填完整地址 `https://github.com/guoxdxdxd/WorkSelf`。装好后按提示**重启 DSH**（宿主侧插件不热更）。
 
 ### 本地开发（改代码用）
 
@@ -200,6 +192,6 @@ workos/
 
 ## 说明
 
-- 已发布到 npm：包名 `workself`，插件 id 与包名一致；同一份代码也能用 GitHub 地址或本地 link 安装。
+- 没有发布到 npm（npm 新账号的 2FA 只支持安全密钥，命令行发布会返回 403）；安装走 GitHub 地址或本地 link。包名固定为 `workself`，插件 id 与包名一致。
 - 旧版「一个项目一个 md」的档案仍可读取：第一次写入或点「设置 → 迁移旧档案」时自动拆成文件夹结构。
 - 更新记录、设计细节与更细的界面说明见 [`docs/PLUGIN.md`](docs/PLUGIN.md)。
