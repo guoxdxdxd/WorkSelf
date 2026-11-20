@@ -9,12 +9,12 @@
  */
 
 window.__ModuleLoader__.load({
-  id: '@local/dsh-workos',
+  id: 'workself',
   factory(require) {
     const React = require('react')
     const h = React.createElement
     const NS = 'workos'
-    const TYPE_ID = '@local/dsh-workos'
+    const TYPE_ID = 'workself'
     const KIND = 'workos'
 
     const ITEM_STATUSES = ['未开始', '进行中', '等待反馈', '已完成', '已关闭', '暂停']
